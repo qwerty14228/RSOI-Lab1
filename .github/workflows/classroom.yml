@@ -2,7 +2,7 @@ name: GitHub Classroom Workflow
 on:
   push:
     branches:
-      - master
+      - dev
   pull_request:
     branches:
       - master
@@ -15,7 +15,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      # TODO build, test and deploy project
+      - name: Build
+        run: |
+          mkdir Build
+          cd Build
+          cmake ..
+          make
+          ./lab_rsoi1
+
+      # TODO test and deploy project
 
       - name: Run API Tests
         uses: matt-ball/newman-action@master
