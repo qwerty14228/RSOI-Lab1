@@ -25,11 +25,11 @@ class MockPersonStorage : public PersonStorage
         return this->data[id];
     }
 
-    int Create(std::string name, std::string work="", std::string address="", int age=20) override
+    std::shared_ptr<Person> Create(std::string name, std::string work="", std::string address="", int age=20) override
     {
         int new_id = this->next_id++;
         this->data[new_id] = std::make_shared<Person>(new_id, name, work, address, age);
-        return new_id;
+        return this->data[new_id];
     }
 
     bool Delete(int id) override
