@@ -9,6 +9,10 @@ int main ()
     std::shared_ptr<MockPersonStorage> storage = std::make_shared<MockPersonStorage>();
     storage->Create ("Dima");
     storage->Delete (0);
+    int id = storage->Create("Dima", "student");
+    std::cout << storage->getById(id)->name << std::endl;
+    storage->Update(id, "Vlad");
+    std::cout << storage->getById(id)->name << std::endl;
     for(auto &person : storage->getAll()) {
         std::cout << person->name << std::endl;
     }
