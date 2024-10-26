@@ -23,6 +23,15 @@ class MockPersonStorage : public PersonStorage
         return new_id;
     }
 
+    bool Delete(int id) override
+    {
+        if(this->data.find(id) == this->data.end()) {
+            return false;
+        }
+        this->data.erase(id);
+        return true;
+    }
+
     private:
     std::map<int, std::shared_ptr<Person>> data = {
         {0, std::make_shared<Person>(0, "John")},
