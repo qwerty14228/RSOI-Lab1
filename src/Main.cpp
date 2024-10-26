@@ -12,5 +12,6 @@ int main ()
     for(auto &person : storage->getAll()) {
         std::cout << person->name << std::endl;
     }
+    std::cout << storage->getById(1)->name << std::endl;
     return 0;
 }

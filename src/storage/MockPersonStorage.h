@@ -16,6 +16,15 @@ class MockPersonStorage : public PersonStorage
         }
         return output;
     }
+
+    std::shared_ptr<Person> getById(int id) override
+    {
+        if(this->data.find(id) == this->data.end()) {
+            return nullptr;
+        }
+        return this->data[id];
+    }
+
     int Create(std::string name, std::string work="", std::string address="", int age=20) override
     {
         int new_id = this->data.size();
