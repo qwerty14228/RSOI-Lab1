@@ -54,10 +54,7 @@ class MockPersonStorage : public PersonStorage
     }
 
     private:
-    std::map<int, std::shared_ptr<Person>> data = {
-        {0, std::make_shared<Person>(0, "John")},
-        {1, std::make_shared<Person>(1, "Alice")}
-    };
-    int next_id = 2;
+    std::map<int, std::shared_ptr<Person>> data;
+    int next_id = 0;
 };
 #endif

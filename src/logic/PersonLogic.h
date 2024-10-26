@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include "logic/Person.h"
 #include "logic/PersonStorage.h"
 
 class PersonLogic
