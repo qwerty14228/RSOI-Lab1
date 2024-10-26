@@ -1,3 +1,7 @@
+cmake_minimum_required(VERSION 3.29)
 project(lab_rsoi1 CXX)
+find_package(GTest REQUIRED)
 include_directories(src)
 add_executable(lab_rsoi1 src/Main.cpp)
+add_executable(lab_rsoi1_tests src/MainTests.cpp)
+target_link_libraries(lab_rsoi1_tests PRIVATE gtest::gtest)

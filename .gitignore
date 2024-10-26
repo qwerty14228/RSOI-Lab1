@@ -1239,3 +1239,5 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 .vscode/
+python_venv/
+CMakeUserPresets.json

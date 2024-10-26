@@ -15,15 +15,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Dependencies
+        run: |
+          python -m venv python_venv
+          source python_venv/bin/activate
+          pip install conan
+          conan profile detect --force
+          conan install . --output-folder=. --build=missing
+
       - name: Build
         run: |
-          mkdir Build
-          cd Build
-          cmake ..
+          cd build
+          cmake .. --preset conan-release
+          cd Release
           make
           ./lab_rsoi1
 
-      # TODO test and deploy project
+      - name: Run Unit Tests
+        run: | 
+          ./build/Release/lab_rsoi1_tests
+
+      # TODO deploy project
 
       # - name: Run API Tests
       #   uses: matt-ball/newman-action@master
