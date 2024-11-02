@@ -34,7 +34,8 @@ TEST_F(PersonLogicTest, GetsAPerson) {
 
 TEST_F(PersonLogicTest, UpdatesAPerson) {
   auto person = this->personLogic->Create("John", "student", "Moscow Bauman street 10", 18);
-  auto renewedPerson = this->personLogic->Update(person->id, "Vlad", "teacher", "Lenina street 15", 25);
+  this->personLogic->Update(person->id, "Vlad", "teacher", "Lenina street 15", 25);
+  auto renewedPerson = this->personLogic->getById(person->id);
 
   EXPECT_EQ("Vlad", renewedPerson->name);
   EXPECT_EQ("teacher", renewedPerson->work);
