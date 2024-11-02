@@ -31,3 +31,29 @@ TEST_F(PersonLogicTest, GetsAPerson) {
     EXPECT_EQ(retrievedPerson->address, "Moscow Bauman street 10");
     EXPECT_EQ(retrievedPerson->age, 18);
 }
+
+TEST_F(PersonLogicTest, UpdatesAPerson) {
+  auto person = this->personLogic->Create("John", "student", "Moscow Bauman street 10", 18);
+  auto renewedPerson = this->personLogic->Update(person->id, "Vlad", "teacher", "Lenina street 15", 25);
+
+  EXPECT_EQ("Vlad", renewedPerson->name);
+  EXPECT_EQ("teacher", renewedPerson->work);
+  EXPECT_EQ("Lenina street 15", renewedPerson->address);
+  EXPECT_EQ(25, renewedPerson->age);
+}
+
+TEST_F(PersonLogicTest, DeletesAPerson) {
+  auto person = this->personLogic->Create("John", "student", "Moscow Bauman street 10", 18);
+  auto deletedPerson = this->personLogic->Delete(person->id);
+
+  EXPECT_TRUE(deletedPerson);
+  EXPECT_FALSE(this->personLogic->getById(person->id));
+}
+
+TEST_F(PersonLogicTest, GetAllPersons) {
+  this->personLogic->Create("John", "student", "Moscow Bauman street 10", 18);
+  this->personLogic->Create("Alice", "teacher", "Lenina street 15", 25);
+  auto allPersons = this->personLogic->getAll();
+
+  EXPECT_EQ(2, allPersons.size());
+}
