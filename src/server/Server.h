@@ -40,7 +40,7 @@ public:
         });
 
         this->server.add_route("/person/:id").get([this](const auto& req, auto& res) {
-            auto id = req.a("id").as_int();
+            auto id = req.a("id").as_integer();
 
             auto person = this->logic->getById(id);
 
