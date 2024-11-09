@@ -51,7 +51,12 @@ jobs:
           docker build -t $IMAGE_ID:$VERSION .
           docker push $IMAGE_ID:$VERSION
 
-      # TODO deploy project
+      - name: Deploy
+        #if: github.ref_name == 'master'
+        env:
+          deploy_url: ${{ secrets.DEPLOY_HOOK }}
+        run: |
+          curl "$deploy_url"
 
       # - name: Run API Tests
       #   uses: matt-ball/newman-action@master
