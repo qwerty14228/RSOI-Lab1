@@ -44,21 +44,20 @@ public:
 
             auto person = this->logic->getById(id);
 
-            if (person) {
-                boost::json::object person_object = {
-                    {"id", person->id},
-                    {"name", person->name},
-                    {"work", person->work},
-                    {"address", person->address},
-                    {"age", person->age}
-                };
-
-                res.body() = boost::json::serialize(person_object);
-                res.set_header(beast::http::field::content_type, "application/json");
-                return;
+            if (!person) {
+                throw beauty::http_error::client::not_found("Not found");
             }
 
-            res.set(beast::http::status::not_found);
+            boost::json::object person_object = {
+                {"id", person->id},
+                {"name", person->name},
+                {"work", person->work},
+                {"address", person->address},
+                {"age", person->age}
+            };
+
+            res.body() = boost::json::serialize(person_object);
+            res.set_header(beast::http::field::content_type, "application/json");
         });
 
         this->server.listen(this->port);
