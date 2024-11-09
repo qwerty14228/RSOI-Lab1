@@ -9,8 +9,8 @@ int main ()
 
     std::shared_ptr<PersonStorage> storage = std::make_shared<MockPersonStorage>();
     std::shared_ptr<PersonLogic> personLogic = std::make_shared<PersonLogic>(storage);
-    std::shared_ptr<Server> server = std::make_shared<Server>(8085);
-    
+    std::shared_ptr<Server> server = std::make_shared<Server>(personLogic, 8000);
+
     server->run();
 
     return 0;
