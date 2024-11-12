@@ -81,6 +81,13 @@ public:
 
                 res.body() = boost::json::serialize(person_object);
                 res.set_header(beast::http::field::content_type, "application/json");
+            })
+            .del([this](const auto& req, auto& res) {
+                auto id = req.a("id").as_integer();
+
+                this->logic->Delete(id);
+
+                res.result(beast::http::status::no_content);
             });
 
         this->server.listen(this->port);
