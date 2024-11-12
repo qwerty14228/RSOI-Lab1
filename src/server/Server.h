@@ -44,20 +44,10 @@ public:
                 auto body = req.body();
                 auto json_body = boost::json::parse(body);
 
-                if (
-                    !json_body.is_object() ||
-                    !json_body.contains("name") ||
-                    !json_body.contains("work") ||
-                    !json_body.contains("address") ||
-                    !json_body.contains("age")
-                ) {
-                    throw beauty::http_error::client::bad_request("Bad Request");
-                }
-
-                auto name = json_body["name"].as<std::string>();
-                auto work = json_body["work"].as<std::string>();
-                auto address = json_body["address"].as<std::string>();
-                auto age = json_body["age"].as<int>();
+                auto name = boost::json::value_to<std::string>(json_body.at("name"));
+                auto work = boost::json::value_to<std::string>(json_body.at("work"));
+                auto address = boost::json::value_to<std::string>(json_body.at("address"));
+                auto age = boost::json::value_to<int>(json_body.at("age"));
 
                 auto person = this->logic->Create(name, work, address, age);
 
