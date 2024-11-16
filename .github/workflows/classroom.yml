@@ -52,7 +52,7 @@ jobs:
           docker push $IMAGE_ID:$VERSION
 
       - name: Deploy
-        #if: github.ref_name == 'master'
+        if: github.ref_name == 'master'
         env:
           deploy_url: ${{ secrets.DEPLOY_HOOK }}
         run: |
