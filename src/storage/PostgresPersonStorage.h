@@ -21,7 +21,7 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            pqxx::result r = w.exec_prepared("getAll");
+            pqxx::result r = w.exec_prepared(pqxx::prepped{"getAll"});
 
             w.commit();
 
@@ -61,7 +61,7 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            pqxx::result r = w.exec_prepared("Create", name, age, work, address);
+            pqxx::result r = w.exec_prepared(pqxx::prepped{"Create"}, name, age, work, address);
 
             w.commit();
 
