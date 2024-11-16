@@ -1,7 +1,6 @@
 #ifndef POSTGRESPERSONSTORAGE_H
 #define POSTGRESPERSONSTORAGE_H
 
-#include <map>
 #include <iostream>
 #include <pqxx/pqxx>
 #include "logic/PersonStorage.h"
@@ -39,20 +38,34 @@ class PostgresPersonStorage : public PersonStorage
         {
             std::cerr << e.what() << std::endl;
         }
-
-        for (const auto& [key, value] : this->data)
-        {
-            output.emplace_back(value);
-        }
         return output;
     }
 
     std::shared_ptr<Person> getById(int id) override
     {
-        if(this->data.find(id) == this->data.end()) {
-            return nullptr;
+        try
+        {
+            pqxx::work w(this->conn);
+
+            pqxx::result r = w.exec_prepared("get", id);
+
+            w.commit();
+
+            auto row = r[0];
+
+            return std::make_shared<Person>(
+                row[0].as<int>(), 
+                row[1].as<std::string>(), 
+                row[3].as<std::string>(), 
+                row[4].as<std::string>(),
+                row[2].as<int>()
+            );
         }
-        return this->data[id];
+        catch (std::exception const &e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+        return nullptr;
     }
 
     std::shared_ptr<Person> Create(std::string name, std::string work="", std::string address="", int age=20) override
@@ -74,31 +87,45 @@ class PostgresPersonStorage : public PersonStorage
         {
             std::cerr << e.what() << std::endl;
         }
-
-        int new_id = this->next_id++;
-        this->data[new_id] = std::make_shared<Person>(new_id, name, work, address, age);
-        return this->data[new_id];
+        return nullptr;
     }
 
     bool Delete(int id) override
     {
-        if(this->data.find(id) == this->data.end()) {
+        try
+        {
+            pqxx::work w(this->conn);
+
+            pqxx::result r = w.exec_prepared("Delete", id);
+
+            w.commit();
+
+            return true;
+        }
+        catch (std::exception const &e)
+        {
+            std::cerr << e.what() << std::endl;
             return false;
         }
-        this->data.erase(id);
-        return true;
     }
 
     bool Update(int id, std::string name, std::string work="", std::string address="", int age=20) override
     {
-        if(this->data.find(id) == this->data.end()) {
+        try
+        {
+            pqxx::work w(this->conn);
+
+            pqxx::result r = w.exec_prepared("Update", name, work, address, age, id);
+
+            w.commit();
+
+            return true; 
+        }
+        catch (std::exception const &e)
+        {
+            std::cerr << e.what() << std::endl;
             return false;
         }
-        this->data[id]->name = name;
-        this->data[id]->work = work;
-        this->data[id]->address = address;
-        this->data[id]->age = age;
-        return true;
     }
 
     protected: 
@@ -132,8 +159,6 @@ class PostgresPersonStorage : public PersonStorage
     }
 
     private:
-    std::map<int, std::shared_ptr<Person>> data;
-    int next_id = 0;
     pqxx::connection conn;
 };
 #endif
