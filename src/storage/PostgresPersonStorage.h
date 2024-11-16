@@ -2,6 +2,7 @@
 #define POSTGRESPERSONSTORAGE_H
 
 #include <map>
+#include <iostream>
 #include <pqxx/pqxx>
 #include "logic/PersonStorage.h"
 
@@ -24,7 +25,7 @@ class PostgresPersonStorage : public PersonStorage
 
             w.commit();
 
-            for (auto &row : r) {
+            for (auto row : r) {
                 output.emplace_back(std::make_shared<Person>(
                     row[0].as<int>(), 
                     row[1].as<std::string>(), 
@@ -60,12 +61,12 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            pqxx::row r = w.exec_prepared("Create", name, age, work, address);
+            pqxx::result r = w.exec_prepared("Create", name, age, work, address);
 
             w.commit();
-            
+
             return std::make_shared<Person>(
-                r[0].as<int>(), 
+                r[0][0].as<int>(), 
                 name, work, address, age
             );
         }
@@ -106,13 +107,14 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            w.exec1("CREATE TABLE IF NOT EXISTS Persons (
-            id SERIAL PRIMARY KEY, 
-            name TEXT NOT NULL,
-            age INTEGER NULL,
-            work TEXT NULL,
-            address TEXT NULL
-            );"
+            w.exec1(
+                "CREATE TABLE IF NOT EXISTS Persons ("
+                "id SERIAL PRIMARY KEY,"
+                "name TEXT NOT NULL,"
+                "age INTEGER NULL,"
+                "work TEXT NULL,"
+                "address TEXT NULL"
+                ");"
             );
 
             w.commit();
