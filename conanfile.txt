@@ -1,0 +1,11 @@
+[requires]
+gtest/1.15.0
+libpqxx/7.9.2
+beauty/1.0.4
+[tool_requires]
+cmake/3.30.5
+[generators]
+CMakeDeps
+CMakeToolchain
+[layout]
+cmake_layout
