@@ -21,7 +21,7 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            pqxx::result r = w.exec_prepared(pqxx::prepped{"getAll"});
+            pqxx::result r = w.exec_prepared("getAll");
 
             w.commit();
 
@@ -61,7 +61,7 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            pqxx::result r = w.exec_prepared(pqxx::prepped{"Create"}, name, age, work, address);
+            pqxx::result r = w.exec_prepared("Create", name, age, work, address);
 
             w.commit();
 
@@ -107,7 +107,7 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            w.exec1(
+            w.exec(
                 "CREATE TABLE IF NOT EXISTS Persons ("
                 "id SERIAL PRIMARY KEY,"
                 "name TEXT NOT NULL,"
