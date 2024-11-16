@@ -10,6 +10,7 @@
 #include <beauty/endpoint.hpp>
 #include <beauty/swagger.hpp>
 #include <beauty/export.hpp>
+#include <beauty/exception.hpp>
 
 namespace beauty
 {
