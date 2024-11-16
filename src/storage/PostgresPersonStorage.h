@@ -20,7 +20,7 @@ class PostgresPersonStorage : public PersonStorage
         {
             pqxx::work w(this->conn);
 
-            pqxx::result r = w.exec1("SELECT * FROM Persons;");
+            pqxx::result r = w.exec_prepared("getAll");
 
             w.commit();
 
@@ -56,6 +56,24 @@ class PostgresPersonStorage : public PersonStorage
 
     std::shared_ptr<Person> Create(std::string name, std::string work="", std::string address="", int age=20) override
     {
+        try
+        {
+            pqxx::work w(this->conn);
+
+            pqxx::row r = w.exec_prepared("Create", name, age, work, address);
+
+            w.commit();
+            
+            return std::make_shared<Person>(
+                r[0].as<int>(), 
+                name, work, address, age
+            );
+        }
+        catch (std::exception const &e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+
         int new_id = this->next_id++;
         this->data[new_id] = std::make_shared<Person>(new_id, name, work, address, age);
         return this->data[new_id];
@@ -98,6 +116,12 @@ class PostgresPersonStorage : public PersonStorage
             );
 
             w.commit();
+
+            this->conn.prepare("getAll", "SELECT * FROM Persons;");
+            this->conn.prepare("get", "SELECT * FROM Persons WHERE id = $1;");
+            this->conn.prepare("Create", "INSERT INTO Persons (name, age, work, address) VALUES ($1, $2, $3, $4) RETURNING id;");
+            this->conn.prepare("Delete", "DELETE FROM Persons WHERE id = $1;");
+            this->conn.prepare("Update", "UPDATE Persons SET name = $1, work = $2, address = $3, age = $4 WHERE id = $5;");
         }
         catch (std::exception const &e)
         {
