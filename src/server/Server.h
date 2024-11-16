@@ -3,23 +3,15 @@
 
 #include <string>
 
-#include <beauty/beauty.hpp>
 #include <boost/json.hpp>
+
+#include "third_party/beauty_server.hpp"
 
 #include "logic/PersonLogic.h"
 
     class Server {
 public: 
     Server(std::shared_ptr<PersonLogic> &logic, int port): logic(logic), port(port){}
-
-    void get_handler(const beauty::request& req, beauty::response& res) {
-        boost::json::object test_object = {
-            {"test", "it works and deployed from hook!"}
-        };
-
-        res.body() = boost::json::serialize(test_object);
-        res.set_header(beast::http::field::content_type, "application/json");
-    }
 
     void run() {
         this->server
@@ -88,62 +80,53 @@ public:
                 this->logic->Delete(id);
 
                 res.result(beast::http::status::no_content);
+            })
+            .patch([this](const auto& req, auto& res) {
+                auto id = req.a("id").as_integer();
+                
+                auto person = this->logic->getById(id);
+
+                if (!person) {
+                    throw beauty::http_error::client::not_found("Not found");
+                }
+
+                auto name = person->name;
+                auto work = person->work;
+                auto address = person->address;
+                auto age = person->age;
+
+                auto body = req.body();
+                auto json_body = boost::json::parse(body).as_object();
+
+                if (json_body.contains("name")) {
+                    name = boost::json::value_to<std::string>(json_body.at("name"));
+                }
+
+                if (json_body.contains("work")) {
+                    work = boost::json::value_to<std::string>(json_body.at("work"));
+                }
+
+                if (json_body.contains("address")) {
+                    address = boost::json::value_to<std::string>(json_body.at("address"));
+                }
+
+                if (json_body.contains("age")) {
+                    age = boost::json::value_to<int>(json_body.at("age"));
+                }
+
+                this->logic->Update(id, name, work, address, age);
+
+                boost::json::object person_object = {
+                    {"id", id},
+                    {"name", name},
+                    {"work", work},
+                    {"address", address},
+                    {"age", age}
+                };
+
+                res.body() = boost::json::serialize(person_object);
+                res.set_header(beast::http::field::content_type, "application/json");
             });
-
-        
-        auto router = this->server.router();
-
-        auto cb = [this](const auto& req, auto& res) {
-            auto id = req.a("id").as_integer();
-            
-            auto person = this->logic->getById(id);
-
-            if (!person) {
-                throw beauty::http_error::client::not_found("Not found");
-            }
-
-            auto name = person->name;
-            auto work = person->work;
-            auto address = person->address;
-            auto age = person->age;
-
-            auto body = req.body();
-            auto json_body = boost::json::parse(body).as_object();
-
-            if (json_body.contains("name")) {
-                name = boost::json::value_to<std::string>(json_body.at("name"));
-            }
-
-            if (json_body.contains("work")) {
-                work = boost::json::value_to<std::string>(json_body.at("work"));
-            }
-
-            if (json_body.contains("address")) {
-                address = boost::json::value_to<std::string>(json_body.at("address"));
-            }
-
-            if (json_body.contains("age")) {
-                age = boost::json::value_to<int>(json_body.at("age"));
-            }
-
-            this->logic->Update(id, name, work, address, age);
-
-            boost::json::object person_object = {
-                {"id", id},
-                {"name", name},
-                {"work", work},
-                {"address", address},
-                {"age", age}
-            };
-
-            res.body() = boost::json::serialize(person_object);
-            res.set_header(beast::http::field::content_type, "application/json");
-        };
-        
-        router.add_route(
-            beast::http::verb::patch,
-            beauty::route("/api/v1/persons/:id", {}, std::move(cb))
-        );
 
         this->server.listen(this->port);
 
