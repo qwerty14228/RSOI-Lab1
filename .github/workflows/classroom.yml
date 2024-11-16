@@ -45,7 +45,7 @@ jobs:
           IMAGE_ID=ghcr.io/$GITHUB_REPOSITORY
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           VERSION=v.$COMMIT_SHA
-          VERSION=latest
+          [ "$REF_NAME" == "master" ] && VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker build -t $IMAGE_ID:$VERSION .
